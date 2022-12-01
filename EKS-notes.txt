@@ -1,1 +1,51 @@
 
+#### Create a VPC with desired subnets and components from AWS Specified Template file #####
+
+
+aws cloudformation create-stack \
+  --region us-east-2 \
+  --stack-name my-eks-vpc-stack \
+  --template-url https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml
+  
+  
+  
+  ### Create and attach IAM role ###
+  
+  vim eks-cluster-role-trust-policy.json
+  
+  #then insert following codes and save the file 
+  
+  {
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "eks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+
+####
+
+##Create Role
+
+aws iam create-role \
+  --role-name myAmazonEKSClusterRole \
+  --assume-role-policy-document file://"eks-cluster-role-trust-policy.json"
+  
+## Attach Role
+
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy \
+  --role-name myAmazonEKSClusterRole
+  
+ ###
+ Once done go to EKS management console dashboard and configure selecting myAmazonEKSClusterRole and newly created VPC my-eks-vpc-stack-VPC
+ ###
+ 
+
+  
+  
