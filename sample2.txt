@@ -1,1 +1,2 @@
 this is sample2
+This is a new line added
