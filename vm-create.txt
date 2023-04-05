@@ -1,0 +1,27 @@
+# Replace the values in the variables below with your own values
+$vmName = "myVM"
+$resourceGroupName = "myResourceGroup"
+$vnetName = "myVNet"
+$subnetName = "subnet1"
+$adminUsername = "sysadmin"
+$adminPassword = "Passw0rd123#"
+$location = "eastus"
+
+# Connect to your Azure account
+Connect-AzAccount
+
+# Create a new VM configuration
+$vmConfig = New-AzVMConfig -VMName $vmName -VMSize "Standard_B2s"
+
+# Set the VM OS disk image
+$vmConfig = Set-AzVMOperatingSystem -VM $vmConfig -Windows -ComputerName $vmName -Credential (Get-Credential -UserName $adminUsername -Message "Enter the password for the virtual machine") -ProvisionVMAgent -EnableAutoUpdate
+
+# Set the VM network interface configuration
+$vnet = Get-AzVirtualNetwork -Name $vnetName -ResourceGroupName $resourceGroupName
+$subnet = Get-AzVirtualNetworkSubnetConfig -Name $subnetName -VirtualNetwork $vnet
+$nic = New-AzNetworkInterface -Name ($vmName + "-NIC") -ResourceGroupName $resourceGroupName -Location $location -Subnet $subnet
+
+$vmConfig = Add-AzVMNetworkInterface -VM $vmConfig -Id $nic.Id
+
+# Create the new VM
+New-AzVM -ResourceGroupName $resourceGroupName -Location $location -VM $vmConfig -Verbose
