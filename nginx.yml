@@ -1,37 +1,44 @@
-apiVersion: apps/v1
-kind: Deployment
+##############
+apiVersion: v1
+kind: Pod
 metadata:
-  name: nginx-deployment
-spec:
-  replicas: 5
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
+  name: nginx
+  labels:
         app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        ports:
-        - containerPort: 80
-        resources:
-          limits:
-            cpu: 500m
-      imagePullSecrets:
-      - name: my-registry-secret
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
-spec:
-  type: LoadBalancer
-  selector:
+  name: nginx
+  namespace: default
+  labels:
     app: nginx
+ 
+spec:
+  externalTrafficPolicy: Local
   ports:
   - name: http
     port: 80
+    protocol: TCP
     targetPort: 80
+  selector:
+    app: nginx
+  type: LoadBalancer
+#######################
+
+Explanation:
+
+######################
+a Kubernetes Service object that uses the Kubernetes API version 1.
+
+A Service in Kubernetes provides a way to access a set of running Pods in a consistent and reliable manner. It acts as a stable endpoint for accessing the Pod and provides load balancing and service discovery features.
+
+The first object is a Pod, which is a basic unit of deployment in Kubernetes. The Pod is named "nginx" and labeled with "app: nginx". It specifies a container named "nginx" that uses the "nginx:1.14.2" Docker image and exposes port 80.
+
+The second object is a Service, which provides a stable IP address and DNS name for accessing the Pod. The Service is also named "nginx" and labeled with "app: nginx". It specifies a port named "http" that targets port 80 on the Pod, and a load balancer type that distributes traffic to multiple replicas of the Pod. The "externalTrafficPolicy: Local" setting ensures that traffic is only directed to Pods running on the same node as the Service. The Service is also scoped to the default namespace.
