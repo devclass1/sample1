@@ -1,0 +1,29 @@
+# New-AzResourceGroup -Name 'classRG' -Location 'East US2'
+
+# Replace the values in the variables below with your own values
+$vmName = "myVM"
+$resourceGroupName = "classRG"
+$vnetName = "MyVNet"
+$subnetName = "subnet1"
+$location = "eastus2"
+$vnetAddressPrefix = "172.16.0.0/16"
+$subnetAddressPrefix = "172.16.10.0/24"
+
+
+# Create a new VNet with the specified address prefix
+$vnet = New-AzVirtualNetwork `
+    -Name $vnetName `
+    -ResourceGroupName "classRG" `
+    -AddressPrefix $vnetAddressPrefix
+
+# Create a new subnet with the specified address prefix
+$subnet = Add-AzVirtualNetworkSubnetConfig `
+    -Name $subnetName `
+    -AddressPrefix $subnetAddressPrefix `
+    -VirtualNetwork $vnet
+
+# Update the VNet with the new subnet
+Set-AzVirtualNetwork -VirtualNetwork $vnet
+
+# Output the VNet and subnet information
+$vnet.Subnets
